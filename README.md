@@ -1,4 +1,4 @@
-# AuthKey
+# AuthKeys
 
 TODO: Write a gem description
 
@@ -7,7 +7,7 @@ TODO: Write a gem description
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'auth_key'
+gem 'auth_keys'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install auth_key
+    $ gem install auth_keys
 
 ## Usage
 
@@ -24,9 +24,10 @@ TODO: Write usage instructions here
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/auth_key/fork )
+1. Fork it ( https://github.com/takuya/auth_keys/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
-# auth_key
+
+
