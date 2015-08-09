@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = AuthKey::VERSION
   spec.authors       = ["takuya"]
   spec.email         = ["takuy.a.1st+nospam@gmail.com"]
-  spec.summary       = %q{Password loads in ~/.auth_keys }
-  spec.description   = %q{Password loads in ~/.auth_keys } 
+  spec.summary       = %q{Passwords saves/load in ~/.auth_keys }
+  spec.description   = %q{Passwords save/load in ~/.auth_keys(plain text table) } 
   spec.homepage      = "https://github.com/takuya/auth_key"
   spec.license       = "GPLv3"
 
