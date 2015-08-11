@@ -16,13 +16,17 @@ class AuthKeys
         def encrypt()
             data = self.read
             return  if is_encrypted?(data)
-            data = encrypt_data(data, self.master_key)
+            #data = self.encrypt_data_by_pubkey(data)
+            data = self.encrypt_data(data,self.master_key_data)
             save(data)
         end
-        def master_key
-            path = File.expand_path(MASTER_KEY)
-            raise unless File.exists?(path)
-            open(path).read
+        def decrypt()
+            data = self.read
+            return unless is_encrypted?(data)
+            data = data.force_encoding("ASCII-8BIT")
+            #data = self.decrypt_data_by_privkey(data)
+            data = self.decrypt_data(data,self.master_key_data)
+            self.save(data)
         end
         def decrypt_data(data,pass)
             data = data.force_encoding("ASCII-8BIT")
@@ -33,16 +37,32 @@ class AuthKeys
             cipher.pkcs5_keyivgen(pass, salt)
             cipher.update(data) + cipher.final
         end
+        def rsautil
+            OpenSSL::PKey::RSA.new(self.master_key_data)
+        end
+        def encrypt_data_by_pubkey(data)
+            self.rsautil.public_encrypt(data)
+        end
+        def decrypt_data_by_privkey(data)
+            self.rsautil.private_decrypt(data)
+        end
 
-        def decrypt()
-            data = self.read
-            data = data.force_encoding("ASCII-8BIT")
-            return unless is_encrypted?(data)
-            data = self.decrypt_data(data,self.master_key)
-            self.save(data)
+        def is_salted?(str)
+            /Salted__/ === str[0,8] 
         end
         def is_encrypted?(str)
-            /Salted__/ === str[0,8] 
+            # check encrypt by trying to treat as  UTF-8 String
+            begin 
+                str.split("")
+                return false
+            rescue => e
+                return true
+            end
+        end
+        def master_key_data
+            path = File.expand_path(MASTER_KEY)
+            raise unless File.exists?(path)
+            open(path).read
         end
         def save(content)
             path = File.expand_path(KEY_PATH)
@@ -54,7 +74,7 @@ class AuthKeys
 
         def load()
             content = self.read
-            content = self.decrypt_data(content,self.master_key) if is_encrypted?(content)
+            content = self.decrypt_data(content,self.master_key_data) if is_encrypted?(content)
             array = content 
                         .split("\n")
                         .reject{|e| e.strip =~/^#/}
@@ -82,9 +102,9 @@ end
 
 if $0 == __FILE__ then
     require 'pp'
-    pp AuthKeys.load
-    pp AuthKeys.keys
-    pp AuthKeys["softbank"]
-    pp AuthKeys.encrypt
+    #pp AuthKeys.load
+    #pp AuthKeys.keys
+    #pp AuthKeys["softbank"]
+    #pp AuthKeys.encrypt
 end
 
