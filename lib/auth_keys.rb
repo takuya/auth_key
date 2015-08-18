@@ -88,6 +88,10 @@ class AuthKeys
         end
         def get(key)
             hash = self.load
+            if key.class == Regexp then
+                key = self.keys.find{|e| e=~key}
+                return nil unless key
+            end
             hash.key?(key) ? hash[key] : nil ; 
         end
         def [](key)
