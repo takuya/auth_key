@@ -51,6 +51,7 @@ class AuthKeys
             /Salted__/ === str[0,8] 
         end
         def is_encrypted?(str)
+            return true if self.is_salted?(str)
             # check encrypt by trying to treat as  UTF-8 String
             begin 
                 str.split("")
