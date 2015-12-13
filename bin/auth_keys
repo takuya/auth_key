@@ -4,21 +4,21 @@ def load_path
   path = File.expand_path( "../lib", File.dirname(File.realpath(__FILE__))  )
   $:.unshift path
 end
-load_path;
 
 require 'pp'
 require 'auth_keys'
 require 'optparse'
 require 'json'
 
+
 opt = []
 keys = []
 ARGV << "-h" unless ARGV.size > 0
 op = OptionParser.new
-op.on("-e","--encrypt", "#{AuthKeys::KEY_PATH}を暗号化"){ opt <<  "encrypt"}
-op.on("-d","--decrypt", "#{AuthKeys::KEY_PATH}を平文化"){ opt <<  "decrypt" }
-op.on("-k [key]","--key", "#{AuthKeys::KEY_PATH}に含まれる識別子から検索"){|key| if key then opt << "key" ;keys << key else  opt<<"list" end }
-op.on("-l", "--list",   "#{AuthKeys::KEY_PATH}に含まれる識別子を一覧"){ opt << "list" }
+op.on("-e","--encrypt", "#{AuthKeys.KEY_PATH}を暗号化"){ opt <<  "encrypt"}
+op.on("-d","--decrypt", "#{AuthKeys.KEY_PATH}を平文化"){ opt <<  "decrypt" }
+op.on("-k [key]","--key", "#{AuthKeys.KEY_PATH}に含まれる識別子から検索"){|key| if key then opt << "key" ;keys << key else  opt<<"list" end }
+op.on("-l", "--list",   "#{AuthKeys.KEY_PATH}に含まれる識別子を一覧"){ opt << "list" }
 
 op.parse!(ARGV)
 

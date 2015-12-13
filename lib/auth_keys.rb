@@ -1,14 +1,14 @@
 
 require 'openssl'
 class AuthKeys
-    KEY_PATH = "~/.auth_keys"
-    MASTER_KEY = "~/.ssh/id_rsa"
     class << self
+        def KEY_PATH ; ENV["KEY_PATH"] ||  "~/.auth_keys" end
+        def MASTER_KEY ;  ENV["MASTER_KEY"] ||  "~/.ssh/id_rsa" end
         def encrypt_data(data,pass)
             cipher = OpenSSL::Cipher::Cipher.new("AES-256-CBC")
             salt = OpenSSL::Random.random_bytes(8)
             cipher.encrypt
-            cipher.pkcs5_keyivgen(pass, salt)
+            cipher.pkcs5_keyivgen(pass, salt, 1)
             data = cipher.update(data) + cipher.final
             ## salted
             data = "Salted__" + salt + data
@@ -16,7 +16,7 @@ class AuthKeys
         def encrypt()
             data = self.read
             return  if is_encrypted?(data)
-            #data = self.encrypt_data_by_pubkey(data)
+
             data = self.encrypt_data(data,self.master_key_data)
             save(data)
         end
@@ -24,7 +24,6 @@ class AuthKeys
             data = self.read
             return unless is_encrypted?(data)
             data = data.force_encoding("ASCII-8BIT")
-            #data = self.decrypt_data_by_privkey(data)
             data = self.decrypt_data(data,self.master_key_data)
             self.save(data)
         end
@@ -34,7 +33,7 @@ class AuthKeys
             data = data[16, data.size]
             cipher = OpenSSL::Cipher::Cipher.new("AES-256-CBC")
             cipher.decrypt
-            cipher.pkcs5_keyivgen(pass, salt)
+            cipher.pkcs5_keyivgen(pass, salt, 1 )
             cipher.update(data) + cipher.final
         end
         def rsautil
@@ -48,12 +47,12 @@ class AuthKeys
         end
 
         def is_salted?(str)
-            /Salted__/ === str[0,8] 
+            /Salted__/ === str[0,8]
         end
         def is_encrypted?(str)
             return true if self.is_salted?(str)
             # check encrypt by trying to treat as  UTF-8 String
-            begin 
+            begin
                 str.split("")
                 return false
             rescue => e
@@ -61,14 +60,14 @@ class AuthKeys
             end
         end
         def master_key_data
-            path = File.expand_path(MASTER_KEY)
+            path = File.expand_path(self.MASTER_KEY)
             raise unless File.exists?(path)
             open(path).read
         end
         def save(content)
-            path = File.expand_path(KEY_PATH)
+            path = File.expand_path(self.KEY_PATH)
             raise "#{path} not found." unless File.exists?(path)
-            open(path, "w"){|f| 
+            open(path, "w"){|f|
                 f.write content
             }
         end
@@ -76,14 +75,14 @@ class AuthKeys
         def load()
             content = self.read
             content = self.decrypt_data(content,self.master_key_data) if is_encrypted?(content)
-            array = content 
+            array = content
                         .split("\n")
                         .reject{|e| e.strip =~/^#/}
                         .map(&:split).map{|e| [e[0],[   e[1],e[2]  ] ] }
             password_table = Hash[array]
         end
         def read()
-            path = File.expand_path(KEY_PATH)
+            path = File.expand_path(self.KEY_PATH)
             raise unless File.exists?(path)
             content = open(path).read
         end
@@ -93,7 +92,7 @@ class AuthKeys
                 key = self.keys.find{|e| e=~key}
                 return nil unless key
             end
-            hash.key?(key) ? hash[key] : nil ; 
+            hash.key?(key) ? hash[key] : nil ;
         end
         def [](key)
             self.get(key)
@@ -107,9 +106,8 @@ end
 
 if $0 == __FILE__ then
     require 'pp'
-    #pp AuthKeys.load
-    #pp AuthKeys.keys
-    #pp AuthKeys["softbank"]
-    #pp AuthKeys.encrypt
+    pp AuthKeys.load
+    pp AuthKeys.keys
+    pp AuthKeys["softbank"]
+    pp AuthKeys.encrypt
 end
-
