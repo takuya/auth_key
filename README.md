@@ -21,7 +21,7 @@ File format is TSV(space sperated) for easy to edit.
     require 'auth_keys'
     AuthKeys["site_name"]
 
-~/.auth_keys to store id/pass pair.
+~/.auth_keys is to store id/pass pair.
 
 | key(site_name) | login_id | password |
 |----------------|----------|----------|
