@@ -5,10 +5,10 @@ class AuthKeys
         def KEY_PATH ; ENV["KEY_PATH"] ||  "~/.auth_keys" end
         def MASTER_KEY ;  ENV["MASTER_KEY"] ||  "~/.ssh/id_rsa" end
         def encrypt_data(data,pass)
-            cipher = OpenSSL::Cipher::Cipher.new("AES-256-CBC")
+            cipher = OpenSSL::Cipher.new("AES-256-CBC")
             salt = OpenSSL::Random.random_bytes(8)
             cipher.encrypt
-            cipher.pkcs5_keyivgen(pass, salt, 1)
+            cipher.pkcs5_keyivgen(pass, salt, 100 )
             data = cipher.update(data) + cipher.final
             ## salted
             data = "Salted__" + salt + data
@@ -31,9 +31,9 @@ class AuthKeys
             data = data.force_encoding("ASCII-8BIT")
             salt = data[8,8]
             data = data[16, data.size]
-            cipher = OpenSSL::Cipher::Cipher.new("AES-256-CBC")
+            cipher = OpenSSL::Cipher.new("AES-256-CBC")
             cipher.decrypt
-            cipher.pkcs5_keyivgen(pass, salt, 1 )
+            cipher.pkcs5_keyivgen(pass, salt, 100 )
             cipher.update(data) + cipher.final
         end
         def rsautil
